@@ -37,7 +37,7 @@ kılıyor. Kod kalitesi beklenenin üzerinde: tip anotasyonlu, UTF-16 offset yö
    modelden tam karakter konumu istemek yerine satırı numaralandırıp modelden satır
    ipucu + kanıt metni istemek, sonra tam satır → bölünmüş satır → kısmi kelime →
    onarılmış (typo/aksan) eşleşme sırasıyla aramak. Bizim orijinal planımızdaki "tüm
-   belgede ara, yoksa ele" yaklaşımından çok daha sağlam — küçük model (gemma3:4b)
+   belgede ara, yoksa ele" yaklaşımından çok daha sağlam — küçük model (gemma4:e4b)
    büyük ihtimalle Gemini'den daha fazla küçük hata yapacağı için bize onlardan daha
    kritik.
 2. **Run-cache / replay modu** (`_save_run`/`detect_from_run`): modelin ham cevabını

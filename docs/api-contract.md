@@ -62,7 +62,7 @@ rapor **tek bir tip** üzerinden çalışır. Bu, Kişi 2'nin işini kaynaktan b
 
 ## 3. Kanıt doğrulama: kademeli arama (naif substring aramasından daha sağlam)
 
-Orijinal plan "alıntıyı belgede ara, yoksa ele" diyordu. Bu, gemma3:4b gibi küçük bir
+Orijinal plan "alıntıyı belgede ara, yoksa ele" diyordu. Bu, gemma4:e4b gibi küçük bir
 modelin ufak bir boşluk/satır sonu/aksan hatası yapması durumunda bulguyu gereksiz yere
 eler. DataVeil'in `detector.py`/`_pieces()` mantığını Türkçe'ye uyarlayıp şu sırayla
 deniyoruz (ilk eşleşen kazanır, `satir` ipucuna en yakın olan seçilir):
