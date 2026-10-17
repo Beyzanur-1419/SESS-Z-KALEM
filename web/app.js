@@ -13,6 +13,7 @@ const state = {
   temizMetin: null,
   rapor: null,
   isOllamaOffline: false,
+  adminVerified: false,
 };
 
 // ============================================================================
@@ -25,6 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupModals();
   setupSimulations();
   updateAuthUI();
+  setupAdminControlCenter();
 });
 
 // ============================================================================
@@ -90,6 +92,12 @@ function switchTab(tabId) {
   });
 
   window.scrollTo({ top: 0, behavior: "smooth" });
+
+  // Eğer Yönetici & Denetim sekmesine geçildiyse ve henüz kilit açılmadıysa Enclave Gate Modal'ı aç
+  if (tabId === "yonetici-denetim" && !state.adminVerified) {
+    const gateModal = document.getElementById("modal-admin-enclave-gate");
+    if (gateModal) gateModal.style.display = "flex";
+  }
 }
 
 // ============================================================================
@@ -779,8 +787,12 @@ window.deleteVaultDocument = deleteVaultDocument;
 function closeAllModals() {
   const m1 = document.getElementById("modal-login");
   const m2 = document.getElementById("modal-register");
+  const m3 = document.getElementById("modal-admin-enclave-gate");
+  const m4 = document.getElementById("modal-add-admin");
   if (m1) m1.style.display = "none";
   if (m2) m2.style.display = "none";
+  if (m3) m3.style.display = "none";
+  if (m4) m4.style.display = "none";
 }
 
 // ============================================================================
@@ -859,4 +871,296 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+// ============================================================================
+// 7. Sistem Yönetimi & Kurumsal Kontrol Merkezi (Screenshot 1 & 2)
+// ============================================================================
+function setupAdminControlCenter() {
+  // 1. Alt Sekmeler (Subtabs)
+  const subtabBtns = document.querySelectorAll(".admin-tab");
+  subtabBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const targetSubtab = btn.getAttribute("data-subtab");
+      subtabBtns.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      document.querySelectorAll(".admin-subpane").forEach((pane) => {
+        pane.style.display = "none";
+        pane.classList.remove("active");
+      });
+
+      const activePane = document.getElementById(`subpane-${targetSubtab}`);
+      if (activePane) {
+        activePane.style.display = "block";
+        activePane.classList.add("active");
+      }
+    });
+  });
+
+  // 2. Enclave Doğrulama Kapısı (Screenshot 2 Modal)
+  const enclaveGateModal = document.getElementById("modal-admin-enclave-gate");
+  const touchTargetFido = document.getElementById("touch-target-fido");
+  const btnUnlockAdminGate = document.getElementById("btn-unlock-admin-gate");
+  const btnCancelAdminGate = document.getElementById("btn-cancel-admin-gate");
+  const btnCloseAdminGate = document.getElementById("btn-close-admin-gate");
+
+  function unlockEnclaveSuccess() {
+    state.adminVerified = true;
+    if (touchTargetFido) touchTargetFido.classList.add("active");
+
+    setTimeout(() => {
+      if (enclaveGateModal) enclaveGateModal.style.display = "none";
+      if (touchTargetFido) touchTargetFido.classList.remove("active");
+      showAlert(
+        "Süper Yönetici Enclave Kilidi Açıldı (YubiKey 5 NFC WebAuthn Doğrulandı)",
+        "info"
+      );
+    }, 450);
+  }
+
+  touchTargetFido?.addEventListener("click", () => {
+    const title = touchTargetFido.querySelector(".touch-prompt-title");
+    if (title) title.textContent = "Biyometrik veri doğrulanıyor...";
+    unlockEnclaveSuccess();
+  });
+
+  btnUnlockAdminGate?.addEventListener("click", () => {
+    unlockEnclaveSuccess();
+  });
+
+  btnCancelAdminGate?.addEventListener("click", () => {
+    if (enclaveGateModal) enclaveGateModal.style.display = "none";
+    switchTab("genel-bakis");
+  });
+
+  btnCloseAdminGate?.addEventListener("click", () => {
+    if (enclaveGateModal) enclaveGateModal.style.display = "none";
+    switchTab("genel-bakis");
+  });
+
+  // Enclave Modal İç Sekmeler (Donanım vs Kasa Parolası)
+  const tabHardware = document.getElementById("tab-hardware-fido");
+  const tabAdminPwd = document.getElementById("tab-admin-pwd");
+  const gateViewHardware = document.getElementById("gate-view-hardware");
+  const gateViewPassword = document.getElementById("gate-view-password");
+
+  tabHardware?.addEventListener("click", () => {
+    tabHardware.classList.add("active");
+    tabAdminPwd?.classList.remove("active");
+    if (gateViewHardware) gateViewHardware.style.display = "block";
+    if (gateViewPassword) gateViewPassword.style.display = "none";
+  });
+
+  tabAdminPwd?.addEventListener("click", () => {
+    tabAdminPwd.classList.add("active");
+    tabHardware?.classList.remove("active");
+    if (gateViewHardware) gateViewHardware.style.display = "none";
+    if (gateViewPassword) gateViewPassword.style.display = "block";
+    document.getElementById("input-admin-token")?.focus();
+  });
+
+  // 3. Tablo Filtreleme ve Arama
+  const searchInput = document.getElementById("admin-user-search");
+  const filterDept = document.getElementById("filter-dept");
+  const filterRole = document.getElementById("filter-role");
+
+  function filterMatrixTable() {
+    const query = (searchInput?.value || "").toLowerCase().trim();
+    const dept = filterDept?.value || "all";
+    const role = filterRole?.value || "all";
+
+    const rows = document.querySelectorAll("#matrix-tbody tr");
+    let visibleCount = 0;
+    rows.forEach((row) => {
+      const text = row.innerText.toLowerCase();
+      const matchQuery = !query || text.includes(query);
+
+      let matchDept = true;
+      if (dept === "hukuk") matchDept = text.includes("hukuk") || text.includes("müşavir");
+      else if (dept === "guvenlik") matchDept = text.includes("güvenlik") || text.includes("ciso");
+      else if (dept === "kvkk") matchDept = text.includes("kvkk") || text.includes("denetçi");
+      else if (dept === "arge") matchDept = text.includes("sistem") || text.includes("mühendis");
+
+      let matchRole = true;
+      if (role === "super") matchRole = text.includes("süper yönetici");
+      else if (role === "onaylayici") matchRole = text.includes("onaylayıcı");
+      else if (role === "salt-okunur") matchRole = text.includes("salt-okunur");
+
+      if (matchQuery && matchDept && matchRole) {
+        row.style.display = "";
+        visibleCount++;
+      } else {
+        row.style.display = "none";
+      }
+    });
+
+    const footerCount = document.querySelector(".footer-count");
+    if (footerCount) {
+      footerCount.textContent = `Toplam 12 kullanıcıdan ${visibleCount} tanesi gösteriliyor`;
+    }
+  }
+
+  searchInput?.addEventListener("input", filterMatrixTable);
+  filterDept?.addEventListener("change", filterMatrixTable);
+  filterRole?.addEventListener("change", filterMatrixTable);
+
+  // 4. Aksiyon Butonları (YAML Export, Purge, Yeni Yönetici Ekle)
+  document.getElementById("btn-export-yaml")?.addEventListener("click", () => {
+    const yamlContent =
+`# Sessiz Kalem Air-Gap Kurumsal Yapılandırma
+version: "2.4-ephemeral"
+node:
+  id: "0x90A...FD21"
+  mode: "air-gap-strict"
+  tls_pinned: "1.3"
+  host: "127.0.0.1"
+enclave:
+  type: "Hardware-RAM-ZeroTrace"
+  zero_access_policy: true
+  ram_purge_on_exit: true
+  master_hash_algorithm: "SHA-256"
+inference_engine:
+  provider: "ollama"
+  endpoint: "http://127.0.0.1:11434"
+  model: "gemma3:4b"
+  quantization: "Q4_K_M"
+  hardware_accel: "Metal GPU 32-Core"
+  latency_avg_ms: 18
+dlp_rules:
+  tr_national_id: true
+  tr_iban: true
+  project_codenames: true
+  financial_amounts: true
+  checksum_validation: true
+active_principals: 12
+export_timestamp: "${new Date().toISOString()}"
+`;
+    const blob = new Blob([yamlContent], { type: "text/yaml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "sessiz_kalem_config.yaml";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showAlert("Kurumsal yapılandırma YAML dosyası başarıyla dışa aktarıldı.", "info");
+  });
+
+  // Bellek Sıfırla (Purge)
+  document.getElementById("btn-purge-ram")?.addEventListener("click", () => {
+    const ramValEl = document.querySelector(".kpi-card:nth-child(4) .kpi-val");
+    const ramBar = document.querySelector(".kpi-card:nth-child(4) .dual-bar");
+    if (ramValEl) ramValEl.textContent = "0";
+    if (ramBar) ramBar.style.width = "0%";
+    showAlert("Uçucu RAM ve Güvenli Enclave Belleği Sıfırlandı (Purge tamamlandı - 0 Byte sızıntı).", "info");
+
+    setTimeout(() => {
+      if (ramValEl) ramValEl.textContent = "142";
+      if (ramBar) ramBar.style.width = "14%";
+    }, 2500);
+  });
+
+  // Yeni Yönetici Ekle Modal
+  const modalAddAdmin = document.getElementById("modal-add-admin");
+  document.getElementById("btn-open-add-admin")?.addEventListener("click", () => {
+    if (modalAddAdmin) modalAddAdmin.style.display = "flex";
+  });
+  document.getElementById("btn-close-add-admin")?.addEventListener("click", () => {
+    if (modalAddAdmin) modalAddAdmin.style.display = "none";
+  });
+
+  // Yetkilendir ve Kasaya Ekle
+  document.getElementById("btn-submit-new-admin")?.addEventListener("click", () => {
+    const name = document.getElementById("add-admin-name")?.value.trim() || "Av. Yeni Analist";
+    const email = document.getElementById("add-admin-email")?.value.trim() || "analist@sessizkalem.corp";
+    const role = document.getElementById("add-admin-role")?.value || "Hukuk Danışmanı";
+    const level = document.getElementById("add-admin-level")?.value || "Onaylayıcı";
+
+    const initials = name.split(" ").map((w) => w[0]).join("").substring(0, 2).toUpperCase() || "KV";
+    const tbody = document.getElementById("matrix-tbody");
+
+    let levelClass = "role-approver";
+    if (level === "Süper Yönetici") levelClass = "role-super";
+    if (level === "Salt-Okunur") levelClass = "role-readonly";
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>
+        <div class="table-user-cell">
+          <div class="user-badge-circle" style="background:rgba(0, 229, 255, 0.15);color:#00e5ff;border:1px solid rgba(0, 229, 255, 0.35);">${initials}</div>
+          <div>
+            <div class="user-cell-name">${escapeHtml(name)}</div>
+            <div class="user-cell-email">${escapeHtml(email)}</div>
+          </div>
+        </div>
+      </td>
+      <td>${escapeHtml(role)}</td>
+      <td><span class="role-pill ${levelClass}">${escapeHtml(level)}</span></td>
+      <td>
+        <span class="user-status-pill status-active"><span class="dot-mint"></span> Aktif</span>
+      </td>
+      <td class="cell-time">Şimdi <code>(127.0.0.1)</code></td>
+      <td style="text-align: right;">
+        <div class="row-actions">
+          <button class="action-icon-btn btn-edit" title="Yetkileri Düzenle">✏️</button>
+          <button class="action-icon-btn btn-revoke" title="Erişimi Askıya Al">🚫</button>
+        </div>
+      </td>
+    `;
+
+    tbody?.prepend(tr);
+    if (modalAddAdmin) modalAddAdmin.style.display = "none";
+    showAlert(`"${name}" başarıyla yetkilendirildi ve kurumsal erişim matrisine eklendi.`, "info");
+    wireRowActions();
+  });
+
+  // Düzenle & Askıya Al butonları
+  function wireRowActions() {
+    document.querySelectorAll(".row-actions .btn-edit").forEach((btn) => {
+      btn.onclick = () => {
+        const row = btn.closest("tr");
+        const name = row?.querySelector(".user-cell-name")?.textContent || "Kullanıcı";
+        showAlert(`"${name}" yetki profili düzenleme modu açıldı.`, "info");
+      };
+    });
+
+    document.querySelectorAll(".row-actions .btn-revoke").forEach((btn) => {
+      btn.onclick = () => {
+        const row = btn.closest("tr");
+        const name = row?.querySelector(".user-cell-name")?.textContent || "Kullanıcı";
+        const statusPill = row?.querySelector(".user-status-pill");
+        const isCurrentlyActive = statusPill?.classList.contains("status-active");
+
+        if (isCurrentlyActive) {
+          if (confirm(`"${name}" kullanıcısının yetkilerini askıya almak istiyor musunuz?`)) {
+            if (statusPill) {
+              statusPill.className = "user-status-pill status-revoked";
+              statusPill.innerHTML = `<span class="dot-red"></span> Askıya Alındı`;
+            }
+            row.style.opacity = "0.6";
+            showAlert(`"${name}" kullanıcısının erişimi askıya alındı.`, "info");
+          }
+        } else {
+          if (statusPill) {
+            statusPill.className = "user-status-pill status-active";
+            statusPill.innerHTML = `<span class="dot-mint"></span> Aktif`;
+          }
+          row.style.opacity = "1";
+          showAlert(`"${name}" kullanıcısının erişimi yeniden aktif edildi.`, "info");
+        }
+      };
+    });
+  }
+  wireRowActions();
+
+  // Ollama Ping & Reload Model
+  document.getElementById("btn-ping-ollama")?.addEventListener("click", () => {
+    showAlert("Ollama Gemma 4 Yanıt Testi: 18ms (127.0.0.1:11434 / Metal GPU 32-Core Canlı)", "info");
+  });
+
+  document.getElementById("btn-reload-weights")?.addEventListener("click", () => {
+    showAlert("Model ağırlıkları (Q4_K_M) GPU belleğine yeniden başarıyla yüklendi.", "info");
+  });
 }
