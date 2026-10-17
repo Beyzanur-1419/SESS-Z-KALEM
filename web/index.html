@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sessiz Kalem | Air-Gap Yerel Belge Redaksiyonu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <!-- Uygulama Düzeni (Sidebar + Main) -->
+  <div class="app-layout">
+    
+    <!-- Sol Kenar Çubuğu (Sidebar) -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="M9 12l2 2 4-4"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">Sessiz Kalem</span>
+          <span class="brand-badge">AIR-GAP V2.4</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" data-tab="genel-bakis">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Genel Bakış
+        </button>
+        <button class="nav-item" data-tab="yeni-analiz">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          Yeni Analiz
+        </button>
+        <button class="nav-item" data-tab="analiz-sonuclari" id="nav-analiz-sonuclari">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Analiz Sonuçları
+          <span class="nav-badge" id="sidebar-finding-count" style="display: none;">0</span>
+        </button>
+        <button class="nav-item" data-tab="onizleme-indir" id="nav-onizleme">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          Önizleme & İndir
+        </button>
+        <button class="nav-item" data-tab="gizlilik-sistem">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Gizlilik ve Sistem
+        </button>
+        <button class="nav-item" data-tab="yonetici-denetim">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/></svg>
+          Yönetici & Denetim
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-status-pill">
+          <span class="status-indicator online"></span>
+          <span class="status-text">Ollama 127.0.0.1</span>
+        </div>
+        <div class="sidebar-version-info">
+          <span>Gemma 4 · Q4_K_M</span>
+          <span>Sıfır Bulut Sızıntısı</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Ana İçerik Alanı -->
+    <main class="main-content">
+      
+      <!-- Üst Bar (Top Bar) -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="pill-badge pill-ollama" id="ollama-status-badge">
+            <span class="pulse-dot"></span>
+            <span>Ollama: Bağlı (Gemma 4 · 127.0.0.1)</span>
+          </div>
+          <div class="pill-badge pill-ram">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            <span>RAM-ONLY EPHEMERAL</span>
+          </div>
+          <div class="pill-badge pill-airgap">
+            <span class="dot-muted"></span>
+            <span class="airgap-text">AIR-GAP ÇEVRİMDIŞI ÇALIŞMA ALANI</span>
+            <span class="airgap-sub">:: GİZLİLİK KATMANI v2.4</span>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <!-- Giriş Yapılmamış Durum -->
+          <div id="auth-unlogged" class="auth-group">
+            <button class="btn btn-outline-sm" id="btn-open-login">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+              Giriş Yap
+            </button>
+            <button class="btn btn-primary-sm" id="btn-open-register">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Kayıt Ol / Yerel Kasa Oluştur
+            </button>
+          </div>
+
+          <!-- Giriş Yapılmış Durum -->
+          <div id="auth-logged" class="auth-group" style="display: none;">
+            <div class="user-session-badge">
+              <span class="pulse-dot"></span>
+              <span class="user-session-name" id="topbar-username">hakan.guvenlik</span>
+              <span class="badge-vault-tag">KASA AKTİF</span>
+            </div>
+            <button class="btn btn-outline-xs" id="btn-logout" title="Kasayı Kilitle ve Oturumu Kapat">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Kasayı Kilitle
+            </button>
+          </div>
+
+          <div class="topbar-icons">
+            <button class="icon-btn" title="Simülasyon: Ollama Durumu Aç/Kapat" id="btn-toggle-ollama">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            </button>
+            <button class="icon-btn" title="Güvenlik Bildirimleri">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </button>
+            <div class="user-avatar" id="user-avatar-badge" title="Yerel Oturum">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Global Hata / Uyarı Çubuğu (Örn. 503 Model Erişilemez) -->
+      <div class="alert-banner" id="global-alert" style="display: none;">
+        <div class="alert-content">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="global-alert-text">Hata mesajı</span>
+        </div>
+        <button class="alert-close" onclick="document.getElementById('global-alert').style.display='none'">&times;</button>
+      </div>
+
+      <!-- =================================================================== -->
+      <!-- TAB 1: GENEL BAKIŞ (Dashboard) -->
+      <!-- =================================================================== -->
+      <section class="tab-pane active" id="pane-genel-bakis">
+        
+        <!-- Hero Bölümü -->
+        <div class="hero-section">
+          <div class="hero-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/></svg>
+            OLLAMA • GEMMA 4 MOTORU • %100 YEREL İŞLEM
+          </div>
+          <h1 class="hero-title">Gizli belgeleriniz, <span class="highlight-mint">sizin kontrolünüzde.</span></h1>
+          <p class="hero-desc">
+            Yapay zekâ destekli hassas bilgi tespiti ve belge maskeleme. Gemma 4 ile tamamen yerel
+            analiz (Ollama 127.0.0.1), kullanıcı onaylı güvenli redaksiyon ve sıfır bulut sızıntısı.
+          </p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" id="btn-hero-start">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Belge Analizine Başla
+            </button>
+            <button class="btn btn-secondary" id="btn-hero-sample">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Örnek Sözleşmeyle İncele
+            </button>
+            <button class="btn btn-link" id="btn-hero-key">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+              Giriş Yap / Kasa Anahtarı
+            </button>
+          </div>
+          <div class="hero-tags">
+            <span class="tag-item"><span class="check-icon">✓</span> RAM-Only Geçici Bellek</span>
+            <span class="tag-item"><span class="check-icon">✓</span> Harici Ağ İstekleri Bloklu</span>
+            <span class="tag-item"><span class="check-icon">✓</span> Sıfır Log / Ephemeral</span>
+          </div>
+        </div>
+
+        <!-- Kullanıcı KriptoKasa & Analiz Geçmişi Bölümü (Giriş Yapılınca Aktif) -->
+        <div class="user-vault-card" id="user-vault-section" style="display: none;">
+          <div class="vault-header">
+            <div class="vault-title-wrap">
+              <div class="vault-icon-box">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+              </div>
+              <div>
+                <div class="vault-heading">
+                  <span class="vault-user-name" id="vault-user-display">hakan.guvenlik</span>
+                  <span class="vault-status-pill"><span class="dot-mint"></span> ÇALIŞMA ALANI AÇIK</span>
+                </div>
+                <div class="vault-subtitle">Cihazınızda donanım anahtarıyla korunan şifreli analiz geçmişi (AES-GCM-256)</div>
+              </div>
+            </div>
+            <div class="vault-actions">
+              <button class="btn btn-primary-sm" id="btn-vault-new-analysis">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                + Bu Kasada Yeni Analiz
+              </button>
+            </div>
+          </div>
+
+          <!-- Kasa Mini İstatistikleri -->
+          <div class="vault-stats-row">
+            <div class="v-stat">
+              <span class="v-stat-label">Kasaya Kayıtlı Belge</span>
+              <span class="v-stat-val" id="vault-doc-count">0</span>
+            </div>
+            <div class="v-stat">
+              <span class="v-stat-label">Toplam Maskelenen Veri</span>
+              <span class="v-stat-val text-mint" id="vault-masked-count">0</span>
+            </div>
+            <div class="v-stat">
+              <span class="v-stat-label">Sıfır Bulut İzolasyonu</span>
+              <span class="v-stat-val text-cyan">%100 Air-Gap</span>
+            </div>
+          </div>
+
+          <!-- Kullanıcının Analiz Geçmişi Listesi -->
+          <div class="vault-history-wrap">
+            <div class="vault-history-header">
+              <span>KASADAKİ BELGE ANALİZLERİ</span>
+              <span class="vault-history-hint">Yalnızca bu oturum şifresiyle çözülebilir</span>
+            </div>
+            <div class="vault-doc-list" id="vault-doc-list">
+              <!-- Dinamik doldurulacak -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Canlı Karşılaştırmalı Denetim Laboratuvarı -->
+        <div class="comparison-lab">
+          <div class="lab-header">
+            <div class="lab-title">
+              <span class="lab-dot"></span>
+              <h2>Canlı Karşılaştırmalı Denetim Laboratuvarı</h2>
+            </div>
+            <div class="lab-meta">
+              <span>Gemma 4 Çıkarım Gecikmesi: <strong class="text-mint">142ms</strong></span>
+              <span>•</span>
+              <span>Belge Boyutu: <strong>1.2 MB</strong></span>
+            </div>
+          </div>
+
+          <div class="lab-grid">
+            <!-- Sol: Orijinal Belge -->
+            <div class="lab-card lab-card-left">
+              <div class="lab-card-header">
+                <div class="doc-badge doc-badge-warning">
+                  <span class="badge-dot warning-dot"></span>
+                  HASSAS ORİJİNAL BELGE (İŞLENMEMİŞ)
+                </div>
+                <div class="doc-filename">Gizlilik_Sozlesmesi_v3.pdf</div>
+              </div>
+              <div class="lab-doc-body">
+                <div class="doc-code-line">MADDE 4.2 - TARAFLAR VE TİCARİ YÜKÜMLÜLÜKLER</div>
+                <br>
+                <div class="doc-code-line">
+                  İşbu sözleşme kapsamında danışman <mark class="mark-kisi">Ayşe Yılmaz</mark>,
+                  şirket bünyesinde gizli olarak yürütülen <mark class="mark-kod">Atlas Projesi</mark>
+                  veri tabanı mimarisi üzerinde tam yetkiyle çalışacaktır.
+                </div>
+                <br>
+                <div class="doc-code-line">
+                  İlk faz tamamlanma bedeli olan <mark class="mark-tutar">450.000 TL</mark> hak ediş,
+                  yüklenicinin QNB Finansbank nezdindeki <mark class="mark-iban">TR44 0011 1000 0000 0456 7890 12</mark>
+                  nolu hesabına en geç 5 iş günü içinde transfer edilecektir.
+                </div>
+                <br>
+                <div class="doc-code-line text-muted">
+                  • Tespit: 2 Doğrudan Kimlik Verisi (Kişi, IBAN), 2 Ticari Sır (Proje Kodu, Tutar).
+                </div>
+              </div>
+              <div class="lab-card-footer">
+                <span class="footer-alert-text">⚠ 4 Kritik İhlal Riski</span>
+                <span class="footer-hash">SHA-256: d83f...a290</span>
+              </div>
+            </div>
+
+            <!-- Orta: Gemma 4 Yerel Motor Göstergesi -->
+            <div class="lab-card-center">
+              <div class="engine-circle">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+              </div>
+              <div class="engine-name">Gemma 4</div>
+              <div class="engine-sub">OLLAMA 127.0.0.1</div>
+              <ul class="engine-steps">
+                <li>• NER Maskeleme</li>
+                <li>• Regex Eşleme</li>
+                <li>• RAM Sanitizer</li>
+              </ul>
+              <button class="btn btn-outline-xs" id="btn-re-run-demo">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                Taramayı Yenile
+              </button>
+            </div>
+
+            <!-- Sağ: Maskeli Çıktı -->
+            <div class="lab-card lab-card-right">
+              <div class="lab-card-header">
+                <div class="doc-badge doc-badge-mint">
+                  <span class="badge-dot mint-dot"></span>
+                  SESSİZ KALEM REDAKTE ÇIKTI
+                </div>
+                <div class="doc-tag-safe">KORUMALI • AIR-GAP SAFE</div>
+              </div>
+              <div class="lab-doc-body">
+                <div class="doc-code-line text-muted">REDAKSİYONLU METİN (GÜVENLİ PAYLAŞIM)</div>
+                <br>
+                <div class="doc-code-line">
+                  İşbu sözleşme kapsamında danışman <span class="pseudonym-pill pill-cyan">🔒 [KİŞİ_01]</span>,
+                  şirket bünyesinde gizli olarak yürütülen <span class="pseudonym-pill pill-purple">📁 [PROJE_AD_A]</span>
+                  veri tabanı mimarisi üzerinde tam yetkiyle çalışacaktır.
+                </div>
+                <br>
+                <div class="doc-code-line">
+                  İlk faz tamamlanma bedeli olan <span class="pseudonym-pill pill-blue">💰 [TUTAR_BEDEL]</span> hak ediş,
+                  yüklenicinin QNB Finansbank nezdindeki <span class="pseudonym-pill pill-green">🏦 [IBAN_TR_01]</span>
+                  nolu hesabına en geç 5 iş günü içinde transfer edilecektir.
+                </div>
+                <br>
+                <div class="doc-code-line text-mint">
+                  🛡 %100 Kurumsal Sır İzolasyonu Onaylandı.
+                </div>
+              </div>
+              <div class="lab-card-footer">
+                <span class="footer-note">Kayıpsız PDF/DOCX Üretimi</span>
+                <div class="footer-btns">
+                  <button class="btn btn-xs" id="btn-copy-masked-preview">Kopyala</button>
+                  <button class="btn btn-xs btn-primary-xs" id="btn-quick-download">⬇ İndir</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 Güvenlik İlkeleri Kartı -->
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon-box">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+            </div>
+            <div class="feature-num">01 / LOCAL MODEL HOST</div>
+            <h3 class="feature-title">Yerel Yapay Zekâ</h3>
+            <p class="feature-text">
+              Belgeler asla harici sunuculara veya OpenAI/Anthropic bulutuna gitmez. Gemma 4 modeli
+              doğrudan cihazınızdaki yerel Ollama API'si üzerinden izole bir sanal alanda koşturulur.
+            </p>
+            <div class="feature-meta">
+              <div>İnternet Erişimi: <strong>Gerektirmez</strong></div>
+              <div>Bulut Yüklemesi: <strong class="text-mint">0 KB</strong></div>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-box">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+            </div>
+            <div class="feature-num">02 / HYBRID NER + REGEX</div>
+            <h3 class="feature-title">Bağlamsal & Kural Tabanlı Tespit</h3>
+            <p class="feature-text">
+              Sadece T.C. Kimlik veya IBAN gibi sabit şablonlar değil; Gemma 4'ün anlamsal zekâsı ile şirket içi
+              kod adları, ticari sırlar, gizli patent başvuruları ve proje isimleri kusursuz taranır.
+            </p>
+            <div class="feature-meta">
+              <div>Türkçe Dil: <strong>Hassasiyeti Yüksek</strong></div>
+              <div>Tespit Doğruluğu: <strong class="text-mint">99.4%</strong></div>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-box">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <div class="feature-num">03 / ZERO-TRACE RUNTIME</div>
+            <h3 class="feature-title">Tam Denetim ve Şeffaflık</h3>
+            <p class="feature-text">
+              Hangi ifadenin maskeleneceğini kullanıcı tek tek seçer veya onaylar. Diske tek bir geçici
+              byte kaydedilmez; analiz ve maskeleme yalnızca uçucu RAM katmanında gerçekleştirilir.
+            </p>
+            <div class="feature-meta">
+              <div>Oturum Sonu RAM: <strong>Temizliği</strong></div>
+              <div>Data Footprint: <strong class="text-mint">Zero Data</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Bilgi Şeridi -->
+        <footer class="app-footer">
+          <div class="footer-item"><span class="dot-mint"></span> Ollama Servisi Aktif: <code>127.0.0.1:11434</code></div>
+          <div class="footer-item"><span>💻</span> Model: Gemma 4 Q4_K_M (4.3 GB RAM)</div>
+          <div class="footer-item"><span>🛡</span> Hack Day 2026 - Açık Kaynak Güvenlik Mimarisi</div>
+          <div class="footer-badge">GPL-3.0 VERIFIED</div>
+        </footer>
+      </section>
+
+      <!-- =================================================================== -->
+      <!-- TAB 2: YENİ ANALİZ (Belge Yükleme) -->
+      <!-- =================================================================== -->
+      <section class="tab-pane" id="pane-yeni-analiz">
+        <div class="section-header">
+          <div class="section-title-wrap">
+            <span class="section-subtitle">GÜVENLİ YEREL BELGE YÜKLEME</span>
+            <h2>Analiz Edilecek Belgeyi Seçin</h2>
+          </div>
+          <p class="section-desc">
+            PDF, DOCX veya TXT formatındaki belgeler tamamen tarayıcınız ve yerel Ollama motoru üzerinden incelenir. 
+            Hiçbir veri internete veya dış sunuculara aktarılmaz.
+          </p>
+        </div>
+
+        <div class="upload-container">
+          <div class="dropzone" id="document-dropzone">
+            <input type="file" id="file-input" accept=".txt,.docx,.pdf" style="display: none;">
+            <div class="dropzone-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <h3 class="dropzone-title">Belgenizi buraya sürükleyin veya göz atın</h3>
+            <p class="dropzone-hint">Desteklenen dosya tipleri: <code>.PDF</code>, <code>.DOCX</code>, <code>.TXT</code> (Maks. 50 MB)</p>
+            <div class="dropzone-actions">
+              <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Dosya Seç
+              </button>
+              <button class="btn btn-secondary" id="btn-load-sample-upload">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                Örnek Gizlilik Sözleşmesi Yükle
+              </button>
+            </div>
+          </div>
+
+          <!-- Yükleme İlerleme Durumu -->
+          <div class="upload-progress-card" id="upload-progress" style="display: none;">
+            <div class="progress-info">
+              <div class="progress-file-name" id="progress-file-name">dosya.pdf</div>
+              <div class="progress-status" id="progress-status-text">Gemma 4 ile Yerel Analiz Yapılıyor...</div>
+            </div>
+            <div class="progress-bar-wrap">
+              <div class="progress-bar-fill" id="progress-bar-fill"></div>
+            </div>
+            <div class="progress-subtext text-muted">
+              Satırlar ayrıştırılıyor, kural tanıyıcıları ve Ollama çıkarım motoru çalışıyor...
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================== -->
+      <!-- TAB 3: ANALİZ SONUÇLARI (İnceleme Ekranı - Issue #7) -->
+      <!-- =================================================================== -->
+      <section class="tab-pane" id="pane-analiz-sonuclari">
+        <div class="review-page-header">
+          <div>
+            <div class="review-badge">
+              <span class="badge-dot mint-dot"></span>
+              DENETİM VE KULLANICI ONAY PANORAMASI
+            </div>
+            <h2 class="review-title" id="review-doc-title">Belge Bulguları İnceleme Ekranı</h2>
+            <p class="review-desc">
+              Her bulgunun belgedeki <strong>kanıt metnini</strong> inceleyin, maskelenmesini onaylayın veya reddedin.
+            </p>
+          </div>
+          <div class="review-header-actions">
+            <button class="btn btn-outline" id="btn-accept-all">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Tümünü Kabul Et
+            </button>
+            <button class="btn btn-primary" id="btn-proceed-mask">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Maskelemeyi Uygula
+            </button>
+          </div>
+        </div>
+
+        <!-- İstatistik Şeridi -->
+        <div class="stats-ribbon">
+          <div class="stat-pill">
+            <span class="stat-label">Toplam Bulgu</span>
+            <span class="stat-value" id="stat-total">0</span>
+          </div>
+          <div class="stat-pill stat-pill-success">
+            <span class="stat-label">Kabul Edilen</span>
+            <span class="stat-value text-mint" id="stat-accepted">0</span>
+          </div>
+          <div class="stat-pill stat-pill-danger">
+            <span class="stat-label">Reddedilen</span>
+            <span class="stat-value text-red" id="stat-rejected">0</span>
+          </div>
+          <div class="stat-pill stat-pill-warning">
+            <span class="stat-label">Doğrulanamayan (Elle Kontrol)</span>
+            <span class="stat-value text-yellow" id="stat-unverified">0</span>
+          </div>
+        </div>
+
+        <!-- "Bu belgede özellikle ara" (Elle Bulgu Ekleme Kutusu) -->
+        <div class="manual-add-card">
+          <div class="manual-add-header">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <h3>Bu belgede özellikle ara / Elle Bulgu Ekle</h3>
+          </div>
+          <form id="form-manual-finding" class="manual-add-form">
+            <div class="form-group flex-2">
+              <label for="manual-kanit">Kanıt Metni (Belgedeki ifade):</label>
+              <input type="text" id="manual-kanit" placeholder="Örn: Proje Gizli Şifresi veya İsim" required>
+            </div>
+            <div class="form-group flex-1">
+              <label for="manual-kategori">Kategori:</label>
+              <select id="manual-kategori">
+                <option value="kod_adi">kod_adi</option>
+                <option value="musteri_bilgisi">musteri_bilgisi</option>
+                <option value="teklif_bedeli">teklif_bedeli</option>
+                <option value="ozel_anlasma">ozel_anlasma</option>
+                <option value="tc_kimlik">tc_kimlik</option>
+                <option value="iban">iban</option>
+                <option value="telefon">telefon</option>
+                <option value="plaka">plaka</option>
+                <option value="api_anahtari">api_anahtari</option>
+                <option value="eposta">eposta</option>
+                <option value="strateji">strateji</option>
+                <option value="diger">diger</option>
+              </select>
+            </div>
+            <div class="form-group flex-1">
+              <label for="manual-risk">Risk Seviyesi:</label>
+              <select id="manual-risk">
+                <option value="yuksek">Yüksek</option>
+                <option value="orta" selected>Orta</option>
+                <option value="dusuk">Düşük</option>
+              </select>
+            </div>
+            <div class="form-actions-inline">
+              <button type="submit" class="btn btn-secondary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Bulgu Olarak Ekle
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Bulgu Listesi (Kanıt Metinleriyle Birlikte) -->
+        <div class="findings-container">
+          <div class="findings-header-row">
+            <span>TESPİT EDİLEN BULGULAR VE KANITLAR</span>
+            <span class="findings-filter-hint">Kabul veya Reddederek maskeleme kararlarını netleştirin</span>
+          </div>
+          
+          <div id="findings-list" class="findings-list">
+            <!-- Dinamik olarak JS tarafından doldurulacak -->
+            <div class="empty-state">
+              <p>Henüz yüklenmiş bir belge yok. Lütfen "Yeni Analiz" sekmesinden bir belge yükleyin veya örnek sözleşmeyi deneyin.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================== -->
+      <!-- TAB 4: ÖNİZLEME & İNDİR -->
+      <!-- =================================================================== -->
+      <section class="tab-pane" id="pane-onizleme-indir">
+        <div class="section-header">
+          <div class="section-title-wrap">
+            <span class="section-subtitle">GÜVENLİ ÇIKTI VE DIŞA AKTARIM</span>
+            <h2>Maskelenmiş Belge Önizleme & İndir</h2>
+          </div>
+          <p class="section-desc">
+            Onaylanan kararlar doğrultusunda metin maskelenmiştir. Çıktı dosyasını veya denetim raporunu indirebilirsiniz.
+          </p>
+        </div>
+
+        <div class="preview-layout">
+          <div class="preview-text-card">
+            <div class="preview-header">
+              <span class="preview-title">Maskelenmiş Metin Çıktısı</span>
+              <button class="btn btn-outline-xs" id="btn-copy-clean-text">Kopyala</button>
+            </div>
+            <textarea id="clean-text-content" class="preview-textarea" readonly></textarea>
+          </div>
+
+          <div class="download-sidebar-card">
+            <h3 class="download-title">Dışa Aktarma Formatları</h3>
+            <p class="download-desc">İhtiyacınıza uygun çıktı formatını seçin:</p>
+
+            <div class="download-options">
+              <button class="download-btn-card" id="btn-download-txt">
+                <div class="format-icon">TXT</div>
+                <div class="format-meta">
+                  <strong>Düz Metin (.txt)</strong>
+                  <span>Sıfır metaveri, temiz UTF-8</span>
+                </div>
+                <div class="download-arrow">↓</div>
+              </button>
+
+              <button class="download-btn-card" id="btn-download-docx">
+                <div class="format-icon docx-icon">DOCX</div>
+                <div class="format-meta">
+                  <strong>Word Belgesi (.docx)</strong>
+                  <span>Düzenlenebilir biçimlendirilmiş belge</span>
+                </div>
+                <div class="download-arrow">↓</div>
+              </button>
+
+              <button class="download-btn-card" id="btn-download-rapor">
+                <div class="format-icon json-icon">JSON</div>
+                <div class="format-meta">
+                  <strong>Denetim Raporu (.json)</strong>
+                  <span>Gizli veri içermeyen kanıtsız özet rapor</span>
+                </div>
+                <div class="download-arrow">↓</div>
+              </button>
+            </div>
+
+            <!-- Denetim Raporu Önizleme Alanı -->
+            <div class="rapor-summary-box" id="rapor-summary-box">
+              <h4>Denetim Rapor Özeti</h4>
+              <pre id="rapor-json-view" class="rapor-pre">Henüz maskeleme yapılmadı.</pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================== -->
+      <!-- TAB 5: GİZLİLİK VE SİSTEM -->
+      <!-- =================================================================== -->
+      <section class="tab-pane" id="pane-gizlilik-sistem">
+        <div class="section-header">
+          <div class="section-title-wrap">
+            <span class="section-subtitle">MİMARİ VE GÜVENLİK MODELİ</span>
+            <h2>Gizlilik ve Sistem Parametreleri</h2>
+          </div>
+        </div>
+
+        <div class="security-grid">
+          <div class="sec-card">
+            <div class="sec-badge">KORUMA KATMANI 1</div>
+            <h3>Air-Gap / Ağ İzolasyonu</h3>
+            <p>Uygulama çalışırken tarayıcıdan harici internete veya üçüncü parti izleyicilere hiçbir HTTP/WebSocket isteği atılamaz. Tüm API çağrıları <code>localhost</code> üzerinden gider.</p>
+          </div>
+          <div class="sec-card">
+            <div class="sec-badge">KORUMA KATMANI 2</div>
+            <h3>RAM-Only Bellek Yürütme</h3>
+            <p>Belgeler sunucu diskine yazılmaz. Yükleme, analiz ve maskeleme safhasında veriler sadece RAM üzerinde tutulur ve işlem bitiminde bellekten temizlenir.</p>
+          </div>
+          <div class="sec-card">
+            <div class="sec-badge">KORUMA KATMANI 3</div>
+            <h3>Kanıtsız Denetim Raporu</h3>
+            <p><code>docs/api-contract.md §4</code> uyarınca üretilen denetim raporlarına tespit edilen hiçbir hassas kanıt metni kaydedilmez; yalnızca kategori ve satır referansı tutulur.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================== -->
+      <!-- TAB 6: YÖNETİCİ & DENETİM (Kurumsal Kontrol Merkezi) -->
+      <!-- =================================================================== -->
+      <section class="tab-pane" id="pane-yonetici-denetim">
+        
+        <!-- Üst Alt Başlık (Breadcrumb) -->
+        <div class="admin-top-sub">
+          <span>SİSTEM KONSOLU // YETKİLİ BÖLGE</span>
+          <span class="sub-sep">•</span>
+          <span class="sub-airgap"><span class="dot-mint"></span> Air-Gap Kalkanı Aktif</span>
+        </div>
+
+        <!-- Ana Başlık ve Aksiyon Butonları -->
+        <div class="admin-header-row">
+          <div class="admin-header-left">
+            <h1 class="admin-page-title">Sistem Yönetimi & Kurumsal Kontrol Merkezi</h1>
+            <p class="admin-page-desc">Çoklu kullanıcı yetkilendirme mimarisi, yerel model motorları, DLP / KVKK hassasiyet ilkeleri ve sistem sağlık metrikleri.</p>
+          </div>
+          <div class="admin-header-actions">
+            <button class="btn btn-outline-sm btn-yaml" id="btn-export-yaml">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Yapılandırmayı Dışa Aktar <span class="badge-yaml">YAML</span>
+            </button>
+            <button class="btn btn-danger-sm" id="btn-purge-ram">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/></svg>
+              Bellek Sıfırla (Purge)
+            </button>
+            <button class="btn btn-primary-sm" id="btn-open-add-admin">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+              + Yeni Yönetici Ekle
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 Üst KPI Metrik Kartı -->
+        <div class="admin-kpi-grid">
+          <!-- KPI 1: Erişim & Kimlik -->
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">ERİŞİM & KİMLİK</span>
+              <div class="kpi-icon-wrap">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="11" r="3"/></svg>
+              </div>
+            </div>
+            <div class="kpi-val-row">
+              <span class="kpi-val">12</span> <span class="kpi-unit">Aktif</span>
+            </div>
+            <div class="kpi-breakdown">
+              <span>3 Sistem Yöneticisi</span>
+              <span>9 Hukuk / Analist</span>
+            </div>
+            <div class="kpi-progress-dual">
+              <div class="dual-bar bar-admin" style="width: 25%;"></div>
+              <div class="dual-bar bar-analyst" style="width: 75%;"></div>
+            </div>
+            <div class="kpi-footer-note">Sertifikalı WebAuthn & YubiKey Zorunlu</div>
+          </div>
+
+          <!-- KPI 2: Yerel Çıkarım Motoru -->
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">YEREL ÇIKARIM MOTORU</span>
+              <div class="kpi-icon-wrap kpi-icon-lightning">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              </div>
+            </div>
+            <div class="kpi-val-row">
+              <span class="kpi-val text-mint">18</span><span class="kpi-unit text-mint">ms</span>
+            </div>
+            <div class="kpi-breakdown">
+              <span>Gemma 4 (Q4_K_M)</span>
+              <span class="text-mint font-bold">● OLLAMA</span>
+            </div>
+            <div class="kpi-sub-badge-row">
+              <code>127.0.0.1:11434</code>
+              <span class="badge-gpu">Metal GPU 32-Core</span>
+            </div>
+          </div>
+
+          <!-- KPI 3: Günlük İşlenen Dosya -->
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">GÜNLÜK İŞLENEN DOSYA</span>
+              <div class="kpi-icon-wrap">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+              </div>
+            </div>
+            <div class="kpi-val-row">
+              <span class="kpi-val">184</span> <span class="kpi-unit">Belge</span>
+            </div>
+            <div class="kpi-breakdown">
+              <span>Sızıntı / Dış Hat:</span>
+              <span class="text-mint font-bold">0 Bayt (%100 İzolasyon)</span>
+            </div>
+            <div class="kpi-breakdown font-mono" style="margin-top: 6px;">
+              <span>1.842 Hassas Varlık Silindi</span>
+              <span class="badge-kvkk">KVKK Uyumlu</span>
+            </div>
+          </div>
+
+          <!-- KPI 4: Güvenli Bellek Enclave -->
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">GÜVENLİ BELLEK ENCLAVE</span>
+              <div class="kpi-icon-wrap">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="4"/><line x1="6" y1="2" x2="6" y2="6"/><line x1="10" y1="2" x2="10" y2="6"/><line x1="14" y1="2" x2="14" y2="6"/><line x1="18" y1="2" x2="18" y2="6"/><line x1="6" y1="18" x2="6" y2="22"/><line x1="10" y1="18" x2="10" y2="22"/><line x1="14" y1="18" x2="14" y2="22"/><line x1="18" y1="18" x2="18" y2="22"/></svg>
+              </div>
+            </div>
+            <div class="kpi-val-row">
+              <span class="kpi-val">142</span> <span class="kpi-unit">MB</span>
+            </div>
+            <div class="kpi-breakdown">
+              <span>Havuz: 8 GB RAM</span>
+              <span class="text-red font-mono">Disk Yazımı: %0</span>
+            </div>
+            <div class="kpi-progress-dual">
+              <div class="dual-bar bar-admin" style="width: 14%;"></div>
+            </div>
+            <div class="kpi-footer-note">Uçucu RAM Alanı (Oturum Sonu İmha)</div>
+          </div>
+        </div>
+
+        <!-- 4 Alt Sekme Navigasyonu -->
+        <div class="admin-subtabs">
+          <button class="admin-tab active" data-subtab="kullanici-matrisi">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Kullanıcı & Erişim Matrisi <span class="admin-tab-count">12</span>
+          </button>
+          <button class="admin-tab" data-subtab="model-cikarim">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+            Model Motoru & Çıkarım
+          </button>
+          <button class="admin-tab" data-subtab="dlp-kvkk">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="11" r="3"/></svg>
+            DLP & KVKK Hassasiyet İlkeleri
+          </button>
+          <button class="admin-tab" data-subtab="denetim-gunlugu">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Denetim Günlüğü & SHA-256
+          </button>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SUBTAB 1: KULLANICI & ERİŞİM MATRİSİ -->
+        <!-- ========================================== -->
+        <div class="admin-subpane active" id="subpane-kullanici-matrisi">
+          
+          <!-- Filtre ve Arama Çubuğu -->
+          <div class="matrix-filter-bar">
+            <div class="matrix-search-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="admin-user-search" placeholder="İsim, e-posta veya rol ara...">
+            </div>
+            <div class="matrix-filter-actions">
+              <select class="matrix-select" id="filter-dept">
+                <option value="all">Tüm Departmanlar</option>
+                <option value="hukuk">Hukuk Müşavirliği</option>
+                <option value="guvenlik">Bilgi Güvenliği</option>
+                <option value="kvkk">KVKK & Uyum</option>
+                <option value="arge">Ar-Ge & Sistem</option>
+              </select>
+              <select class="matrix-select" id="filter-role">
+                <option value="all">Tüm Yetki Seviyeleri</option>
+                <option value="super">Süper Yönetici</option>
+                <option value="onaylayici">Onaylayıcı</option>
+                <option value="salt-okunur">Salt-Okunur</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Kullanıcı Tablosu -->
+          <div class="matrix-table-wrap">
+            <table class="matrix-table">
+              <thead>
+                <tr>
+                  <th>KULLANICI & KİMLİK</th>
+                  <th>KURUMSAL ROL</th>
+                  <th>YETKİ SEVİYESİ</th>
+                  <th>DURUM</th>
+                  <th>SON GÜVENLİ GİRİŞ</th>
+                  <th style="text-align: right;">EYLEMLER</th>
+                </tr>
+              </thead>
+              <tbody id="matrix-tbody">
+                <!-- Row 1: Selin Kaya -->
+                <tr>
+                  <td>
+                    <div class="table-user-cell">
+                      <div class="user-badge-circle badge-sk">SK</div>
+                      <div>
+                        <div class="user-cell-name">Av. Selin Kaya</div>
+                        <div class="user-cell-email">selin.kaya@sessizkalem.corp</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>Baş Hukuk Müşaviri</td>
+                  <td><span class="role-pill role-super">Süper Yönetici</span></td>
+                  <td>
+                    <span class="user-status-pill status-active"><span class="dot-mint"></span> Aktif</span>
+                  </td>
+                  <td class="cell-time">12 Dakika Önce <code>(127.0.0.1)</code></td>
+                  <td style="text-align: right;">
+                    <div class="row-actions">
+                      <button class="action-icon-btn btn-edit" title="Yetkileri Düzenle">✏️</button>
+                      <button class="action-icon-btn btn-revoke" title="Erişimi Askıya Al">🚫</button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 2: Hakan Güvenlik -->
+                <tr>
+                  <td>
+                    <div class="table-user-cell">
+                      <div class="user-badge-circle badge-hg">HG</div>
+                      <div>
+                        <div class="user-cell-name">Dr. Hakan Güvenlik</div>
+                        <div class="user-cell-email">hakan.g@sessizkalem.corp</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>CISO / Bilgi Güvenliği Lideri</td>
+                  <td><span class="role-pill role-super">Süper Yönetici</span></td>
+                  <td>
+                    <span class="user-status-pill status-active"><span class="dot-mint"></span> Aktif</span>
+                  </td>
+                  <td class="cell-time">48 Dakika Önce <code>(127.0.0.1)</code></td>
+                  <td style="text-align: right;">
+                    <div class="row-actions">
+                      <button class="action-icon-btn btn-edit" title="Yetkileri Düzenle">✏️</button>
+                      <button class="action-icon-btn btn-revoke" title="Erişimi Askıya Al">🚫</button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 3: Büşra Erdem -->
+                <tr>
+                  <td>
+                    <div class="table-user-cell">
+                      <div class="user-badge-circle badge-be">BE</div>
+                      <div>
+                        <div class="user-cell-name">Büşra Erdem</div>
+                        <div class="user-cell-email">busra.erdem@sessizkalem.corp</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>Kıdemli KVKK Denetçisi</td>
+                  <td><span class="role-pill role-approver">Onaylayıcı</span></td>
+                  <td>
+                    <span class="user-status-pill status-active"><span class="dot-mint"></span> Aktif</span>
+                  </td>
+                  <td class="cell-time">2 Saat Önce <code>(127.0.0.1)</code></td>
+                  <td style="text-align: right;">
+                    <div class="row-actions">
+                      <button class="action-icon-btn btn-edit" title="Yetkileri Düzenle">✏️</button>
+                      <button class="action-icon-btn btn-revoke" title="Erişimi Askıya Al">🚫</button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 4: Murat Yılmaz -->
+                <tr>
+                  <td>
+                    <div class="table-user-cell">
+                      <div class="user-badge-circle badge-my">MY</div>
+                      <div>
+                        <div class="user-cell-name">Murat Yılmaz</div>
+                        <div class="user-cell-email">m.yilmaz@sessizkalem.corp</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>Sözleşme Analisti</td>
+                  <td><span class="role-pill role-readonly">Salt-Okunur</span></td>
+                  <td>
+                    <span class="user-status-pill status-active"><span class="dot-mint"></span> Aktif</span>
+                  </td>
+                  <td class="cell-time">Dün 17:40 <code>(127.0.0.1)</code></td>
+                  <td style="text-align: right;">
+                    <div class="row-actions">
+                      <button class="action-icon-btn btn-edit" title="Yetkileri Düzenle">✏️</button>
+                      <button class="action-icon-btn btn-revoke" title="Erişimi Askıya Al">🚫</button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Tablo Alt Bilgi ve Sayfalama -->
+            <div class="matrix-footer">
+              <span class="footer-count">Toplam 12 kullanıcıdan 4 tanesi gösteriliyor</span>
+              <div class="pagination-btns">
+                <button class="btn-page" disabled>Önceki</button>
+                <button class="btn-page active">1</button>
+                <button class="btn-page">2</button>
+                <button class="btn-page">3</button>
+                <button class="btn-page">Sonraki</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SUBTAB 2: MODEL MOTORU & ÇIKARIM -->
+        <!-- ========================================== -->
+        <div class="admin-subpane" id="subpane-model-cikarim" style="display: none;">
+          <div class="subpane-card">
+            <h3>Yerel Gemma 4 & Ollama Yapılandırması</h3>
+            <p class="text-muted">Yerel inference hızı, donanım ivmelendirme ve parametre kontrolü.</p>
+            <div class="model-params-grid">
+              <div class="param-box">
+                <label>Model Dağıtımı</label>
+                <div class="param-val">gemma3:4b (Q4_K_M)</div>
+                <span class="badge-tag">Bellek: 4.3 GB</span>
+              </div>
+              <div class="param-box">
+                <label>Bağlantı Endpoint</label>
+                <div class="param-val">http://127.0.0.1:11434</div>
+                <span class="text-mint">● Canlı / Yanıt Veriyor</span>
+              </div>
+              <div class="param-box">
+                <label>Donanım Hızlandırma</label>
+                <div class="param-val">Metal GPU (32-Core)</div>
+                <span class="badge-tag">GPU Offload: %100</span>
+              </div>
+              <div class="param-box">
+                <label>Ortalama Çıkarım Gecikmesi</label>
+                <div class="param-val text-mint">18 ms / token</div>
+                <span class="badge-tag">Throughput: 54 t/s</span>
+              </div>
+            </div>
+            <div class="param-actions" style="margin-top: 18px;">
+              <button class="btn btn-outline-sm" id="btn-ping-ollama">⚡ Çıkarım Motoru Sağlık Testi (Ping)</button>
+              <button class="btn btn-secondary-sm" id="btn-reload-weights">🔄 Model Ağırlıklarını Yeniden Yükle</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SUBTAB 3: DLP & KVKK HASSASİYET İLKELERİ -->
+        <!-- ========================================== -->
+        <div class="admin-subpane" id="subpane-dlp-kvkk" style="display: none;">
+          <div class="subpane-card">
+            <h3>DLP (Veri Kaybı Önleme) ve Maskeleme Kuralları</h3>
+            <p class="text-muted">Kural tabanlı ve yapay zekâ destekli tespit kurallarının hassasiyet eşikleri.</p>
+            <div class="rules-list">
+              <div class="rule-toggle-item">
+                <div>
+                  <strong>T.C. Kimlik Numarası Doğrulayıcısı (Checksum Algoritmalı)</strong>
+                  <div class="text-muted">Presidio uyarlamalı Luhn ve hane kontrolü (recognizers/tr_national_id.py)</div>
+                </div>
+                <input type="checkbox" checked class="admin-switch">
+              </div>
+              <div class="rule-toggle-item">
+                <div>
+                  <strong>Türkiye IBAN ve Banka Hesap Kontrolü</strong>
+                  <div class="text-muted">MOD-97 algoritması ve banka kodu tespiti (recognizers/tr_iban.py)</div>
+                </div>
+                <input type="checkbox" checked class="admin-switch">
+              </div>
+              <div class="rule-toggle-item">
+                <div>
+                  <strong>Gizli Proje Kod Adları & Ar-Ge İfadeleri</strong>
+                  <div class="text-muted">Gemma 4 anlamsal bağlam analizi ile şirket içi kod adları</div>
+                </div>
+                <input type="checkbox" checked class="admin-switch">
+              </div>
+              <div class="rule-toggle-item">
+                <div>
+                  <strong>Teklif Bedelleri, Hak Edişler ve Finansal Rakamlar</strong>
+                  <div class="text-muted">Para birimi, tutar ve ticari gizlilik dereceli bedeller</div>
+                </div>
+                <input type="checkbox" checked class="admin-switch">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SUBTAB 4: DENETİM GÜNLÜĞÜ & SHA-256 -->
+        <!-- ========================================== -->
+        <div class="admin-subpane" id="subpane-denetim-gunlugu" style="display: none;">
+          <div class="subpane-card">
+            <div class="audit-log-terminal">
+              <div><span class="log-time">[2026-10-18 00:00:01]</span> <span class="log-info">[ENCLAVE]</span> Sessiz Kalem Enclave başlatıldı. Hash: <code>secp256k1_8f4e9c21</code></div>
+              <div><span class="log-time">[2026-10-18 00:00:02]</span> <span class="log-success">[OLLAMA]</span> Gemma 4 modeli 127.0.0.1:11434 üzerinde yanıt verdi. Gecikme: 18ms.</div>
+              <div><span class="log-time">[2026-10-18 00:05:14]</span> <span class="log-info">[RULE]</span> Kural tanıyıcıları yüklendi: TR_ID, TR_IBAN, TR_PLATE.</div>
+              <div><span class="log-time">[2026-10-18 00:15:30]</span> <span class="log-success">[AUDIT_HASH]</span> SHA-256 zinciri doğrulandı: <code>0xd83f...a290</code> (Bozulmamış).</div>
+              <div><span class="log-time">[2026-10-18 00:20:45]</span> <span class="log-info">[SESSION]</span> Süper Yönetici oturumu WebAuthn YubiKey ile açıldı (127.0.0.1).</div>
+              <div><span class="log-time">[2026-10-18 00:35:12]</span> <span class="log-success">[REDACT]</span> 4 varlık bellekte maskelendi. Diske veri yazılmadı. Sıfır Sızıntı.</div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- MODAL 1: GİRİŞ YAP (KriptoKasa v2.4 LOCAL) -->
+  <!-- ======================================================================= -->
+  <div class="modal-overlay" id="modal-login" style="display: none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-brand-wrap">
+          <div class="modal-icon-shield">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div>
+            <div class="modal-title">KriptoKasa <span class="modal-version-tag">v2.4 LOCAL</span></div>
+            <div class="modal-sub">Sıfır-Bilgi Güvenli Çalışma Alanı</div>
+          </div>
+        </div>
+        <div class="modal-hardware-tag">
+          <span class="dot-mint"></span> AES-GCM-256 YEREL DONANIM KORUMALI
+        </div>
+        <button class="modal-close" id="btn-close-login">&times;</button>
+      </div>
+
+      <div class="modal-tabs">
+        <button class="modal-tab active">Giriş Yap</button>
+        <button class="modal-tab" id="modal-switch-to-register">Yeni Kasa Kur</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-field">
+          <label>PROFİL / ŞİRKET VEYA KULLANICI KİMLİĞİ</label>
+          <div class="input-with-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input type="text" id="input-login-username" placeholder="ör. hakan.guvenlik veya Hukuk Bürosu A.Ş." value="hakan.guvenlik">
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label>KASA ANAHTAR ŞİFRESİ (MASTER PASSWORD)</label>
+          <div class="input-with-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input type="password" id="input-login-pwd" placeholder="Kasa anahtar şifrenizi girin...">
+            <button type="button" class="btn-reveal" onclick="const p = document.getElementById('input-login-pwd'); p.type = p.type==='password'?'text':'password'">👁</button>
+          </div>
+        </div>
+
+        <div class="salt-session-box">
+          <div class="salt-left">
+            <span class="salt-icon">🔐</span>
+            <div>
+              <div class="salt-title">E2EE Salt & Oturumu</div>
+              <div class="salt-hash">Hash: 8f4e...9c21-secp256k1</div>
+            </div>
+          </div>
+          <button class="btn btn-outline-xs" id="btn-regenerate-salt">↻ Rastgele Üret</button>
+        </div>
+
+        <label class="custom-checkbox">
+          <input type="checkbox" checked>
+          <span>Bu cihazda oturumu sakla (Yalnızca güvenli LocalStorage)</span>
+        </label>
+
+        <button class="btn btn-primary btn-block btn-lg" id="btn-confirm-login">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Giriş Yap ve Çalışma Alanını Aç
+        </button>
+
+        <div class="zero-knowledge-notice">
+          <div class="notice-icon">🛡</div>
+          <div>
+            <strong>SIFIR-BİLGİ İLKESİ (ZERO-KNOWLEDGE)</strong>
+            <p>Parolanız veya ham verileriniz hiçbir uzak sunucuya aktarılmaz. Tüm oturum anahtarları Web Crypto API aracılığıyla doğrudan bu cihaz üzerinde yerel olarak üretilir ve çözülür.</p>
+          </div>
+        </div>
+
+        <div class="modal-footer-link">
+          <span>Kayıt olmadan hızlı inceleme:</span>
+          <a href="#" id="link-direct-demo">Doğrudan Misafir / Demo Analizi Başlat &rarr;</a>
+        </div>
+      </div>
+
+      <div class="modal-status-footer">
+        <span>NODE_ID: 0x90A...FD21</span>
+        <span>STATUS: LOCAL_SECURE_ENCLAVE_READY</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- MODAL 2: KAYIT OL / YENİ KASA OLUŞTUR -->
+  <!-- ======================================================================= -->
+  <div class="modal-overlay" id="modal-register" style="display: none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-brand-wrap">
+          <div class="modal-icon-shield">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div>
+            <div class="modal-title">Sessiz Kalem AI <span class="modal-version-tag">v0.1 AIR-GAP</span></div>
+            <div class="modal-sub">Sıfır-Bilgi Yerel Yapay Zeka ve Güvenli Çalışma Alanı</div>
+          </div>
+        </div>
+        <div class="modal-hardware-tag">
+          <span class="dot-mint"></span> HARDWARE SECURED (AES-GCM-256)
+        </div>
+        <button class="modal-close" id="btn-close-register">&times;</button>
+      </div>
+
+      <div class="modal-tabs">
+        <button class="modal-tab" id="modal-switch-to-login">Giriş Yap</button>
+        <button class="modal-tab active">Kayıt Ol / Yeni Kasa Kur</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-field">
+          <label>PROFİL / KURUM VEYA KULLANICI KİMLİĞİ</label>
+          <div class="input-with-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input type="text" id="input-register-username" placeholder="hakan.guvenlik veya Hukuk Bürosu A.Ş." value="Hukuk Bürosu A.Ş.">
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label>E-POSTA ADRESİ <span class="label-opt">İsteğe Bağlı / Yerel Bildirimler</span></label>
+          <div class="input-with-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <input type="email" placeholder="ornek@hukuk.com">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-field">
+            <label>KASA ANAHTAR PAROLASI</label>
+            <div class="input-with-icon">
+              <input type="password" id="reg-pwd" placeholder="Parola oluşturun...">
+              <button type="button" class="btn-reveal" onclick="const p = document.getElementById('reg-pwd'); p.type = p.type==='password'?'text':'password'">👁</button>
+            </div>
+          </div>
+          <div class="form-field">
+            <label>PAROLA TEKRARI</label>
+            <div class="input-with-icon">
+              <input type="password" placeholder="Parolayı tekrar girin...">
+            </div>
+          </div>
+        </div>
+
+        <div class="entropy-bar-wrap">
+          <div class="entropy-label">
+            <span>🛡 Entropi Seviyesi</span>
+            <span class="text-mint">Güçlü: 16+ karakter, E2EE hazır</span>
+          </div>
+          <div class="entropy-progress">
+            <div class="entropy-seg active"></div>
+            <div class="entropy-seg active"></div>
+            <div class="entropy-seg active"></div>
+            <div class="entropy-seg active"></div>
+          </div>
+        </div>
+
+        <div class="salt-session-box">
+          <div class="salt-left">
+            <span class="salt-icon">🧬</span>
+            <div>
+              <div class="salt-title">Yerel Kriptografik Kasa / Salt Üretimi</div>
+              <div class="salt-hash">SEED: 9b2e08a1...4d18-secp256k1 <span class="badge-pbkdf">PBKDF2-SHA512</span></div>
+            </div>
+          </div>
+          <button class="btn btn-outline-xs">↻ Rastgele Yenile</button>
+        </div>
+
+        <label class="custom-checkbox">
+          <input type="checkbox" checked>
+          <span>Kurtarma anahtarımı ve parolanın sunucuya <strong>ASLA gönderilmeyeceğini</strong>, kaybolması durumunda kurtarılamayacağını anladım (Sıfır-Bilgi / Zero-Knowledge).</span>
+        </label>
+
+        <button class="btn btn-primary btn-block btn-lg" id="btn-confirm-register">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+          Çalışma Alanı / Kasayı Oluştur
+        </button>
+
+        <div class="zero-knowledge-notice">
+          <div class="notice-icon">🛡</div>
+          <div>
+            <strong>SIFİR-BİLGİ İLKESİ (ZERO-KNOWLEDGE)</strong>
+            <p>Parolanız veya oluşturulan yerel anahtarlar hiçbir harici sunucuya veya buluta iletilmez. Tüm şifreleme ve model çıkarımı Web Crypto API ile doğrudan cihazınızda ve korumalı yerel belleğinizde gerçekleşir.</p>
+          </div>
+        </div>
+
+        <div class="modal-footer-link">
+          <span>Zaten bir kasanız veya oturumunuz var mı? <a href="#" id="link-to-login">Giriş Yap</a></span>
+          <a href="#" id="link-direct-demo-2">Misafir / Demo Analizi Başlat &rarr;</a>
+        </div>
+      </div>
+
+      <div class="modal-status-footer">
+        <span>NODE_ID: 0x90A...FD21</span>
+        <span>STATUS: LOCAL_SECURE_ENCLAVE_READY</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- MODAL 3: GÜVENLİ ENCLAVE BÖLGESİ - YÖNETİCİ DOĞRULAMASI (Screenshot 2) -->
+  <!-- ======================================================================= -->
+  <div class="modal-overlay" id="modal-admin-enclave-gate" style="display: none;">
+    <div class="modal-box modal-enclave-box">
+      <div class="modal-header">
+        <div class="modal-brand-wrap">
+          <div class="modal-icon-shield">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="11" r="3"/></svg>
+          </div>
+          <div>
+            <div class="enclave-badge-header">
+              GÜVENLİ ENCLAVE BÖLGESİ • SÜPER YÖNETİCİ KİLİDİ <span class="badge-airgap-mini">🔒 AIR-GAP</span>
+            </div>
+            <div class="modal-title" style="font-size: 18px; margin-top: 2px;">Yönetici Doğrulaması Gerekli</div>
+          </div>
+        </div>
+        <button class="modal-close" id="btn-close-admin-gate">&times;</button>
+      </div>
+
+      <div class="enclave-sub-desc">
+        Sistem ve model denetim paneline erişmek için kurumsal donanım anahtarı (FIDO2 / YubiKey) veya süper yönetici yetki kimliğini doğrulayın.
+      </div>
+
+      <div class="modal-tabs">
+        <button class="modal-tab active" id="tab-hardware-fido">
+          <span>🔑 Donanım Anahtarı (FIDO2)</span>
+        </button>
+        <button class="modal-tab" id="tab-admin-pwd">
+          <span>🛡 Yönetici Kasa Parolası</span>
+        </button>
+      </div>
+
+      <div class="modal-body" style="gap: 18px;">
+        <!-- SEKME 1: Donanım Anahtarı (FIDO2) -->
+        <div id="gate-view-hardware">
+          <div class="biometric-touch-target" id="touch-target-fido">
+            <div class="touch-ring-outer">
+              <div class="touch-ring-inner">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 11c0 2.5-1 3.5-1 5.5"/>
+                  <path d="M8 13.5c.5 1 1 1.5 1 3.5"/>
+                  <path d="M16 13.5c-.5 1-1 1.5-1 3.5"/>
+                  <path d="M12 2a9 9 0 0 0-9 9c0 3 1.5 5 2.5 7"/>
+                  <path d="M12 2a9 9 0 0 1 9 9c0 3-1.5 5-2.5 7"/>
+                  <path d="M12 6a5 5 0 0 0-5 5c0 2.5 1 4 2 5.5"/>
+                  <path d="M12 6a5 5 0 0 1 5 5c0 2.5-1 4-2 5.5"/>
+                </svg>
+              </div>
+            </div>
+            <div class="touch-prompt-title">YubiKey veya Touch ID donanım kilidinize dokunun...</div>
+            <div class="touch-prompt-sub">USB portundaki güvenlik anahtarını onaylayın veya biyometrik okuyucuyu kullanın</div>
+          </div>
+        </div>
+
+        <!-- SEKME 2: Yönetici Kasa Parolası (Şifre Girişi) -->
+        <div id="gate-view-password" style="display: none;">
+          <div class="form-field">
+            <div class="label-row-between">
+              <label>YÖNETİCİ KASA PAROLASI / MASTER TOKEN</label>
+              <span class="text-mint font-mono" style="font-size: 10px;">SHA-256 E2EE</span>
+            </div>
+            <div class="input-with-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <input type="password" id="input-admin-token" placeholder="Yönetici anahtar şifresini girin...">
+              <button type="button" class="btn-reveal" onclick="const p = document.getElementById('input-admin-token'); p.type = p.type==='password'?'text':'password'">👁</button>
+            </div>
+            <div class="text-muted" style="font-size: 12px; margin-top: 6px;">
+              Kurumsal Air-Gap güvenlik konsolunu açmak için şifrenizi girin.
+            </div>
+          </div>
+        </div>
+
+        <!-- Sıfır Erişim Politikası Kutusu -->
+        <div class="enclave-notice-card">
+          <div class="notice-icon-info">ℹ</div>
+          <div>
+            <strong>Sıfır-Erişim Politikası</strong>
+            <p>Bu alana yapılan her başarılı ve başarısız giriş denemesi SHA-256 imzasıyla yerel denetim günlüğüne (audit log) kaydedilir.</p>
+          </div>
+        </div>
+
+        <!-- Butonlar ve Doğrulama Durumu -->
+        <div class="enclave-gate-actions">
+          <div class="enclave-local-status">
+            <span class="dot-mint"></span> AIR-GAP YEREL DOĞRULAMA (127.0.0.1)
+          </div>
+          <div class="gate-btn-group">
+            <button class="btn btn-outline-sm" id="btn-cancel-admin-gate">Vazgeç ve Genel Bakışa Dön</button>
+            <button class="btn btn-primary-sm btn-unlock" id="btn-unlock-admin-gate">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+              Kimliği Doğrula ve Kilidi Aç
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- MODAL 4: YENİ YÖNETİCİ EKLE -->
+  <!-- ======================================================================= -->
+  <div class="modal-overlay" id="modal-add-admin" style="display: none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-brand-wrap">
+          <div class="modal-icon-shield">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+          </div>
+          <div>
+            <div class="modal-title">Yeni Yönetici / Analist Yetkilendir</div>
+            <div class="modal-sub">Kurumsal Erişim ve Rol Tanımlama</div>
+          </div>
+        </div>
+        <button class="modal-close" id="btn-close-add-admin">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-field">
+          <label>AD SOYAD</label>
+          <input type="text" id="add-admin-name" placeholder="Örn: Av. Emre Demir" class="matrix-input">
+        </div>
+        <div class="form-field">
+          <label>KURUMSAL E-POSTA</label>
+          <input type="email" id="add-admin-email" placeholder="emre.demir@sessizkalem.corp" class="matrix-input">
+        </div>
+        <div class="form-row-2">
+          <div class="form-field">
+            <label>KURUMSAL ROL</label>
+            <select id="add-admin-role" class="matrix-select">
+              <option value="Hukuk Danışmanı">Hukuk Danışmanı</option>
+              <option value="KVKK Denetçisi">KVKK Denetçisi</option>
+              <option value="Sistem Mühendisi">Sistem Mühendisi</option>
+              <option value="Veri Koruma Görevlisi">Veri Koruma Görevlisi</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>YETKİ SEVİYESİ</label>
+            <select id="add-admin-level" class="matrix-select">
+              <option value="Süper Yönetici">Süper Yönetici</option>
+              <option value="Onaylayıcı" selected>Onaylayıcı</option>
+              <option value="Salt-Okunur">Salt-Okunur</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-block btn-lg" id="btn-submit-new-admin" style="margin-top: 10px;">
+          Yetkilendir ve Kasaya Ekle
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

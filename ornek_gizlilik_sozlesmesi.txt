@@ -1,0 +1,13 @@
+GİZLİLİK VE TİCARİ İŞBİRLİĞİ SÖZLEŞMESİ
+
+MADDE 1 - TARAFLAR
+İşbu sözleşme, bir tarafta Şirket Yönetimi ile diğer tarafta danışman olarak görev alacak Ayşe Yılmaz arasında imzalanmıştır.
+
+MADDE 2 - PROJE KAPSAMI VE KOD ADI
+Danışman, şirket bünyesinde en yüksek gizlilik derecesinde yürütülmekte olan Atlas Projesi veri tabanı mimarisi, bulut geçiş planları ve çekirdek kaynak kodları üzerinde tam yetkiyle çalışacaktır. Atlas Projesi ile ilgili teknik detaylar üçüncü şahıslarla paylaşılamaz.
+
+MADDE 3 - ÖDEME VE TİCARİ ŞARTLAR
+Danışmanlık hizmetinin ilk faz tamamlanma bedeli olan 450.000 TL tutarındaki hak ediş, yüklenicinin QNB Finansbank nezdindeki TR44 0011 1000 0000 0456 7890 12 nolu banka hesabına en geç 5 iş günü içinde havale/EFT yoluyla transfer edilecektir.
+
+MADDE 4 - ÖZEL HÜKÜMLER
+Sözleşme süresince yürütülecek gizli protokol hükmü saklıdır. Taraflar bilgi güvenliği standartlarına ve yerel air-gap veri koruma ilkelerine tam olarak uyacağını beyan ve taahhüt eder.
