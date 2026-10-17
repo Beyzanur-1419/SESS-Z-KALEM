@@ -96,18 +96,31 @@ ilerleyebilir.
 ```json
 {
   "ozet": { "kategori_basina_sayi": { "kod_adi": 2, "iban": 1 }, "toplam_maskelenen": 5 },
-  "reddedilenler": [ { "kategori": "...", "konum": { "satir": 12 } } ],
+  "reddedilenler": [ { "kategori": "...", "konum": { "satir": 12 }, "risk": "orta" } ],
   "elle_eklenenler": [ { "kategori": "...", "konum": { "satir": 7 } } ],
-  "dogrulanamayanlar": [ { "kategori": "...", "konum": { "satir": 20 }, "not": "elle kontrol edilmeli" } ]
+  "dogrulanamayanlar": [ { "kategori": "...", "konum": { "satir": 20 }, "risk": "yuksek", "not": "elle kontrol edilmeli" } ],
+  "sizinti": { "bulundu": false, "sayi": 0 }
 }
 ```
 
 Rapor **gerçek değer içermez** kuralı (Proje Özeti, Özellikler §7) burada sıkı
 tutuluyor: `kanit` alanı rapora **hiçbir durumda girmez** — reddedilen ya da
 doğrulanamayan bir bulgu bile potansiyel olarak hassas bir değer taşıyabilir,
-bu yüzden yalnızca `kategori` ve `konum.satir` (kullanıcı belgeye dönüp kendi
-gözüyle bakabilsin diye) tutulur. `kabul` edilip maskelenen değerler rapora hiç
-girmez, yalnızca `ozet.kategori_basina_sayi` sayılarıyla görünür.
+bu yüzden yalnızca `kategori`, `konum.satir` (kullanıcı belgeye dönüp kendi
+gözüyle bakabilsin diye) ve `risk` (seviye etiketi, gerçek değer değil) tutulur.
+`kabul` edilip maskelenen değerler rapora hiç girmez, yalnızca
+`ozet.kategori_basina_sayi` sayılarıyla görünür.
+
+`sizinti`: Dilara'nın `engine/pseudonymize.py` modülündeki `sizinti_kontrol`
+fikri — kabul edilip maskelenen bir değerin maskeli metinde hâlâ geçip
+geçmediğinin kontrolü. Raporda yalnızca **sayı/boolean** tutulur, sızan gerçek
+değerler **asla** rapora yazılmaz (yazılırsa raporun kendisi sızıntı kaynağı
+olur).
+
+`report.py` (Melike), bu JSON'u üretir; aynı dosyadaki `markdown()` fonksiyonu
+bu JSON'dan okunabilir bir Markdown raporu türetir (`GET /indir?tip=rapor`
+için) — iki format da aynı tek kaynaktan (bu JSON) üretilir, ayrı ayrı
+hesaplanmaz.
 
 Hata durumu: desteklenmeyen dosya tipi veya boş belge → `400` + `{ "hata": "..." }`.
 Model (Ollama) ayakta değilse → `503` + `{ "hata": "model_erisilemez" }`; arayüz bunu
