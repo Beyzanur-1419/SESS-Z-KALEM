@@ -44,8 +44,11 @@ her iki tarafın da kendi çıktısını bu sözleşmeye göre üretmesi.
    — Melike'nin sentetik belgeleriyle doğrulanacak).
 4. `verify.py`: `docs/api-contract.md` §3'teki kademeli arama (tam satır → bölünmüş
    satır → kısmi kelime → Türkçe ek onarımı).
-5. `pseudonymize.py`: onaylanan bulgulara tutarlı etiket atama (`KOD_ADI_1` gibi, aynı
-   değer = aynı etiket, bkz. §2 "etiket" alanı).
+5. `pseudonymize.py`: **.txt için temel sürüm yazıldı ve test edildi** (7 test) —
+   tutarlı etiket atama + offset kayması olmadan maskeleme
+   (bkz. `docs/maskeleme-notu.md`). **Eksik**: `.docx` çıktısı için
+   offset → paragraf/run ters haritası (aynı dokümanın §3'ü) — bu, biçimlendirmeyi
+   koruyacak asıl zor kısım, henüz yazılmadı.
 6. **Zaman kalırsa**: run-cache/replay (`docs/rakip-analizi-ve-reuse.md`'deki DataVeil
    fikri) — demo güvenliği için değerli ama kapsam dışı başlangıçta.
 
