@@ -77,7 +77,43 @@ Hiçbiri bulamazsa: bulgu silinmez, `durum: "dogrulanamadi"` ile işaretlenir ve
 "elle kontrol edilmeli" listesine düşer. **Sessizce kaybolma yok** — bu DataVeil'in en
 değerli tasarım kararı.
 
-## 4. Dayanak
+## 4. HTTP uç noktaları (Dilara ↔ Beyza sözleşmesi)
+
+`docs/gorev-dagilimi.md`'de öneri olarak duruyordu, burada karara bağlanıyor —
+Beyza'nın arayüzü ve Dilara'nın motoru bundan sonra bunu sabit kabul edip paralel
+ilerleyebilir.
+
+| Uç nokta | Girdi | Çıktı |
+|---|---|---|
+| `POST /belgeler` | dosya (pdf/docx/txt, multipart) | `{ "belge_id": "...", "bulgular": [Bulgu, ...] }` |
+| `POST /bulgular/{id}/karar` | `{ "karar": "kabul" \| "red" }` | güncellenmiş `Bulgu` |
+| `POST /belgeler/{belge_id}/bulgular` | elle eklenen `{ "kategori", "kanit", "konum" }` | yeni `Bulgu` (`kaynak: "elle"`, `durum: "dogrulandi"`) |
+| `POST /belgeler/{belge_id}/maskele` | — (yalnızca `karar: "kabul"` olanlar işlenir) | `{ "temiz_metin": "...", "rapor": Rapor }` |
+| `GET /belgeler/{belge_id}/indir?tip=docx\|txt\|rapor` | — | dosya |
+
+`Bulgu` = bölüm 2'deki birleşik nesne. `Rapor` şeması:
+
+```json
+{
+  "ozet": { "kategori_basina_sayi": { "kod_adi": 2, "iban": 1 }, "toplam_maskelenen": 5 },
+  "reddedilenler": [ { "kategori": "...", "konum": { "satir": 12 } } ],
+  "elle_eklenenler": [ { "kategori": "...", "konum": { "satir": 7 } } ],
+  "dogrulanamayanlar": [ { "kategori": "...", "konum": { "satir": 20 }, "not": "elle kontrol edilmeli" } ]
+}
+```
+
+Rapor **gerçek değer içermez** kuralı (Proje Özeti, Özellikler §7) burada sıkı
+tutuluyor: `kanit` alanı rapora **hiçbir durumda girmez** — reddedilen ya da
+doğrulanamayan bir bulgu bile potansiyel olarak hassas bir değer taşıyabilir,
+bu yüzden yalnızca `kategori` ve `konum.satir` (kullanıcı belgeye dönüp kendi
+gözüyle bakabilsin diye) tutulur. `kabul` edilip maskelenen değerler rapora hiç
+girmez, yalnızca `ozet.kategori_basina_sayi` sayılarıyla görünür.
+
+Hata durumu: desteklenmeyen dosya tipi veya boş belge → `400` + `{ "hata": "..." }`.
+Model (Ollama) ayakta değilse → `503` + `{ "hata": "model_erisilemez" }`; arayüz bunu
+"Ollama çalışıyor mu kontrol edin" mesajıyla göstermeli (demo günü en olası arıza budur).
+
+## 5. Dayanak
 
 - Satır numaralama + kademeli konum bulma: `JoaoPeixoto003/DataVeil`,
   `backend/anonymizer/detector.py` ve `entities.py` (MIT) — mantık port edildi, kod
