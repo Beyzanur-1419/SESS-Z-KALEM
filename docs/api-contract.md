@@ -82,4 +82,4 @@ değerli tasarım kararı.
 - Satır numaralama + kademeli konum bulma: `JoaoPeixoto003/DataVeil`,
   `backend/anonymizer/detector.py` ve `entities.py` (MIT) — mantık port edildi, kod
   birebir kopyalanmadı (onlar Gemini'ye, biz Gemma/Ollama'ya gönderiyoruz).
-- Kategori adları ve risk/guven alanları orijinal SırKalkan planından (Proje Özeti, s.4).
+- Kategori adları ve risk/guven alanları orijinal Sessiz Kalem planından (Proje Özeti, s.4).
