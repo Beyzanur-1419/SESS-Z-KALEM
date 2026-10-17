@@ -8,7 +8,7 @@ FIXTURE_CSV = Path(__file__).resolve().parents[1] / "fixtures" / "ornek_sozlesme
 
 def test_csv_okunuyor():
     beklenenler = csv_io.oku(FIXTURE_CSV)
-    assert len(beklenenler) == 8
+    assert len(beklenenler) == 9
     assert beklenenler[0] == Beklenen(kategori="kod_adi", kanit="Proje Kartal", risk="yuksek")
 
 
