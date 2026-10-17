@@ -1,0 +1,13 @@
+YAZILIM GELİŞTİRME SÖZLEŞMESİ (SENTETİK — TEST AMAÇLIDIR, GERÇEK TARAF İÇERMEZ)
+
+İşbu sözleşme, Mavi Yazılım Ltd. Şti. ile müşteri arasında, dahili olarak
+"Atlas Modülü" adıyla anılan entegrasyon modülünün geliştirilmesi
+kapsamında akdedilmiştir.
+
+Geliştirme ofisi Kozyatağı İnönü Caddesi No:14 adresinde yer almaktadır.
+
+Test ortamına erişim için sağlanan API anahtarı:
+sk-ABCDEFGHIJ1234567890abcdefgh
+
+Toplam teklif bedeli 275.000 TL olarak belirlenmiş olup, bu tutar üçüncü
+kişilerle paylaşılmayacaktır.

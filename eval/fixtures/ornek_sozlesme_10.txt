@@ -1,0 +1,12 @@
+FREELANCE HİZMET SÖZLEŞMESİ (SENTETİK — TEST AMAÇLIDIR, GERÇEK TARAF İÇERMEZ)
+
+İşbu sözleşme, freelance geliştirici Ayşe Demir ile müşteri arasında
+akdedilmiştir.
+
+Ayşe Demir'in iletişim bilgileri: telefon 0505 777 88 99, e-posta
+ayse.demir@example.com.
+
+Üretim ortamına erişim için sağlanan GitHub erişim anahtarı:
+ghp_x1Abx1Abx1Abx1Abx1Abx1Abx1Abx1Abx1Ab
+
+Toplam hizmet bedeli 95.000 TL olarak belirlenmiştir.
