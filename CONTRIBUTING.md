@@ -1,5 +1,21 @@
 # Katkı Rehberi
 
+## Branch ve PR akışı
+
+Her şey issue → branch → PR olarak ilerler, `main`'e doğrudan push yok.
+
+1. Issue numarasını branch adına koy: `issue-3-chunking`, `issue-9-tr-phone` gibi.
+2. Commit mesajları Türkçe, kısa ve "ne" değil "neden" odaklı (mevcut geçmişe bakın).
+3. PR açıklamasında `Closes #<issue no>` yazın — issue otomatik kapanır.
+4. PR açmadan önce `pytest -q` yeşil olmalı (CI zaten bunu kontrol ediyor, ama
+   push'tan önce yerelde de çalıştırın — CI'da kırmızı görmek zaman kaybettirir).
+5. Sözleşmeyi (`docs/api-contract.md`) değiştiren bir PR açıyorsanız, PR
+   açıklamasında hangi bölümü neden değiştirdiğinizi yazın ve diğer iki kişiye
+   haber verin — bu dosya üç kişinin de üzerine kod yazdığı tek kaynak.
+6. Küçük/bağımsız PR'lar tercih edilir (bir issue = bir PR). Gün sonuna
+   yaklaşırken (8. saatten sonra, "dondurma") yeni özellik içeren PR açılmaz,
+   yalnızca hata düzeltme.
+
 ## Yeni bir kural tanıyıcı eklemek
 
 `recognizers/` altına yeni bir dosya ekleyin (örnek: `recognizers/tr_vergi_no.py`),
