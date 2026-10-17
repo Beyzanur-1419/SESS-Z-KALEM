@@ -1,4 +1,4 @@
-# SırKalkan (çalışma adı)
+# Sessiz Kalem
 
 Gizli bir belgeyi bir yapay zekâ servisiyle ya da şirket dışındaki biriyle paylaşmadan
 önce hangi bilgilerin gizlenmesi gerektiğini cihazdan çıkmadan bulan, kullanıcı
