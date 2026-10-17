@@ -148,3 +148,36 @@ def test_uzak_model_reddedilir(host):
 def test_yerel_kabul():
     llm.yerel_mi("http://127.0.0.1:11434")
     llm.yerel_mi("http://localhost:11434")
+
+
+# ---------- #3 kabul: parça sınırında bölünen ifade hiçbir parçadan tamamen kaybolmaz ----------
+def test_parca_sinirinda_bolunen_ifade_en_az_bir_parcada_tam():
+    satirlar = [f"Madde {i}: " + "standart sözleşme metni " * 3 for i in range(1, 80)]
+    metin = "\n".join(satirlar)
+    parcalar = chunking.parcala(metin, boyut=1500, ortusme=200)
+    assert len(parcalar) > 2
+    # "Proje\nKartal" gibi iki satıra bölünmüş her ifade için: ardışık her satır çifti
+    # en az bir parçada BİRLİKTE bulunmalı.
+    for n in range(1, len(satirlar)):
+        assert any(p.ilk_satir <= n and n + 1 <= p.son_satir for p in parcalar), f"L{n}-L{n+1}"
+    # Somut örnek: sınırdaki iki satıra bölünen ad, onu içeren parçada aynen geçer.
+    sinir = parcalar[0].son_satir
+    satirlar[sinir - 1] += " Proje"
+    satirlar[sinir] = "Kartal " + satirlar[sinir]
+    parcalar = chunking.parcala("\n".join(satirlar), boyut=1500, ortusme=200)
+    assert any("Proje\nL" in p.metin and "| Kartal" in p.metin for p in parcalar)
+
+
+# ---------- #4 kabul: satır ipucu bir kaymış olsa da kanıt doğrulanır ----------
+@pytest.mark.parametrize("kayma", [-1, 1])
+def test_satir_ipucu_bir_kaymis_olsa_da_dogrulanir(kayma):
+    dogru_satir = METIN[: METIN.index("850.000 TL")].count("\n") + 1
+    b = dogrula(METIN, _model("850.000 TL", satir=dogru_satir + kayma, kat="teklif_bedeli"))
+    assert b.durum == "dogrulandi" and b.satir == dogru_satir
+    assert METIN[b.baslangic : b.bitis] == "850.000 TL"
+
+
+def test_tamamen_uydurma_kanit_silinmez_dogrulanamadi_olarak_kalir():
+    bulgular = [_model("Gizli Ortak Holding", satir=4, kat="musteri_bilgisi")]
+    sonuc = [dogrula(METIN, b) for b in bulgular]
+    assert len(sonuc) == 1 and sonuc[0].durum == "dogrulanamadi"
