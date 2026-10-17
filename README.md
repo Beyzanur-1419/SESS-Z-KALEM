@@ -9,7 +9,7 @@ Proje özeti ve 10 saatlik plan için bkz. ekip dokümanı. Bu repo için:
 - [`docs/api-contract.md`](docs/api-contract.md) — bulgu şeması ve kanıt doğrulama algoritması (sabit sözleşme)
 - [`docs/rakip-analizi-ve-reuse.md`](docs/rakip-analizi-ve-reuse.md) — emsal projeler ve yeniden kullanılan açık kaynak kod
 - [`docs/hazir-versiyon-kapsam.md`](docs/hazir-versiyon-kapsam.md) — demo kapsamının ötesinde eklenebilecekler
-- [`docs/model-ve-ortam-notu.md`](docs/model-ve-ortam-notu.md) — model kararı (gemma3:4b) ve ortam gereksinimleri
+- [`docs/model-ve-ortam-notu.md`](docs/model-ve-ortam-notu.md) — model kararı (gemma4:e4b) ve ortam gereksinimleri
 - [`docs/maskeleme-notu.md`](docs/maskeleme-notu.md) — maskeleme sırasında metin düzeyinde ne değişir (.txt vs .docx riski)
 - [`recognizers/`](recognizers/) — kural tabanlı tanıyıcılar (T.C. Kimlik No, plaka, IBAN)
 
