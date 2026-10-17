@@ -1,0 +1,15 @@
+# Proje Özeti'ndeki kurulum komutundan sabitlendi (docs/model-ve-ortam-notu.md).
+# Üçünüzün de aynı sürümlerle çalışması için minimum sürüm belirtildi; tam pin
+# (==) yerine >= kullanıldı çünkü tam sürüm numaraları gün içinde organizatör/
+# paket deposuna göre değişebilir (doküman bunu zaten not etmişti).
+
+fastapi>=0.115
+uvicorn>=0.30
+python-multipart>=0.0.9
+httpx>=0.27
+pymupdf>=1.24
+python-docx>=1.1
+cryptography>=42.0
+faker>=25.0
+phonenumbers>=8.13
+pytest>=8.0
