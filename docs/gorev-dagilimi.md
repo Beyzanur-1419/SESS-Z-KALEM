@@ -75,6 +75,31 @@ her iki tarafın da kendi çıktısını bu sözleşmeye göre üretmesi.
 | 8. saat | **Dondurma** — yeni özellik yok, yalnızca hata düzeltme. Melike: README/rapor/sunum hazır mı? |
 | 9 - 10 | Prova, Wi-Fi kapalı demo denemesi, yedek plan (run-cache varsa onunla, yoksa ekran kaydı) |
 
+## Şu an (hiç beklemeden) paralel başlayabilecekler
+
+İş GitHub issue'larına bölündü (#1-#13). Tek bir gerçek darboğaz var: **#8 (gerçek
+API entegrasyonu)**, Dilara'nın #1-#4'ü ve Beyza'nın #5/#7'si bitmeden başlayamaz.
+Geri kalan **12 issue'nun 11'i şu an aynı anda açılabilir**:
+
+| Hemen başla (bağımlılığı yok) | Mock/varsayımla başla, sonra düzelt |
+|---|---|
+| #1 Ollama bağlantısı (Dilara) | #3 chunking.py — Melike'nin tek örnek belgesiyle başla, #10 bitince 1500/200 varsayımını doğrula |
+| #5 main.py mock uç noktalar (Beyza) | #6 yükleme entegrasyonu — `documents.py`'nin (#12) **arayüzü** (fonksiyon imzası) bugün erken netleşirse mock yerine gerçeğine geçmek 1 satır |
+| #7 İnceleme ekranı (Beyza, #5'in mock verisiyle) | #4 verify.py — elle yazılmış örnek kanıt/satır çiftleriyle test edilebilir, gerçek Gemma çıktısını beklemez |
+| #9 tr_phone + tr_api_key (Melike) | |
+| #10 sentetik belgeler (Melike) | |
+| #11 report.py (Melike, sahte bulgu listesiyle) | |
+| #12 documents.py (Melike) | |
+
+**Tek bugünden netleşmesi gereken şey**: `documents.py`'nin extraction
+fonksiyonunun imzası (örn. `extract(dosya) -> str`) — Melike, Beyza ve Dilara
+bunu 5 dakikada konuşup sabitlerse, #3 ve #6 hiç beklemeden gerçek interface'e
+göre yazılabilir, yalnızca `documents.py`'nin *içi* (özellikle #12'deki zor
+docx/run haritası) daha sonra tamamlanır.
+
+Yani pratikte: **#2 (Dilara, #1'in hemen ardından) ve #8 (en son, herkes
+bitince) dışında hiçbir şey birbirini beklemiyor.**
+
 ## Kritik uyarı
 
 3. saat checkpoint'i atlanmasın: Dilara'nın prompt/format denemesi 3. saate kadar
